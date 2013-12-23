@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'json'
+require 'socket'
 
 class Node
   def initialize(socket)
@@ -19,17 +20,18 @@ class Node
     searchMessage["ip"] = @socket[ip]
     searchMessage["port"] = @socket[port]
     @socket.send(JSON.generate(hash), 0, port, ip)
+  end
   def waitLoop
     while true do
       message1, adr = @socket.recvfrom(10)
       message = JSON.parse(message1)
       if message["type"] == "INDEX"
-         url = message["url"]
-         if wordLink.has_key?(url)
-           wordLink[url] += 1
-         else
-           wordLink[url] = 1
-         end
+        url = message["url"]
+        if wordLink.has_key?(url)
+          wordLink[url] += 1
+        else
+          wordLink[url] = 1
+        end
       elsif message["type"] == "SEARCH"
         searchResultMessage = Hash.new
         searchResultMessage["type"] = "SEARCH RESULT"
